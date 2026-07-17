@@ -423,11 +423,15 @@
       <form class="rsvp-form reveal" id="rsvpForm">
         <div>
           <label>Your Name</label>
-          <input type="text" required placeholder="Full name">
+          <input type="text" id="name" required placeholder="Full name">
+        </div>
+        <div>
+          <label>Phone Number</label>
+           <input type="tel" id="phone" placeholder="Enter your mobile number" required>
         </div>
         <div>
           <label>Number of Guests</label>
-          <select>
+          <select id="guests">
             <option>Just me</option>
             <option>2 guests</option>
             <option>3 guests</option>
@@ -436,11 +440,11 @@
         </div>
         <div>
           <label>Which events will you join?</label>
-          <input type="text" placeholder="e.g. Sangeet, Wedding, Reception">
+          <input type="text" id="attending" placeholder="e.g. Sangeet, Wedding, Reception">
         </div>
         <div>
           <label>Message for the couple (optional)</label>
-          <textarea placeholder="Your blessings and wishes..."></textarea>
+          <textarea id="message" placeholder="Your blessings and wishes..."></textarea>
         </div>
         <button type="submit" class="btn" style="justify-self:center;">Send RSVP</button>
         <div class="rsvp-note">This is a demo form — connect it to your own form service or backend to collect real responses.</div>
@@ -521,7 +525,7 @@
   setInterval(updateCountdown,1000);
 
   // RSVP form (demo only, no backend)
-  const scriptURL = "https://script.google.com/macros/s/AKfycbzLN_pEqs_6Jw6nNvYWDsCqKVxDN0dYaDsnxVxxJMxI4ooEwLeVULpmoqKYd0aWF-OO7Q/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbx15bgg1evrPliCVV3g6Bcw9MjtgugK6vI8QkF-dLzzZ0LXRc47Khe2Oy0aAoaXzXJN/exec";
 
 document.getElementById("rsvpForm").addEventListener("submit", function(e) {
     e.preventDefault();
