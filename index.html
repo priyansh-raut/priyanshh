@@ -76,18 +76,62 @@
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
-  nav{max-width:var(--maxw);margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;}
+  nav{max-width:var(--maxw);margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
   .logo{font-family:'Dancing Script';font-size:24px;font-weight:700;color:var(--maroon);}
   .navlinks{display:flex;gap:30px;font-size:13.5px;letter-spacing:0.03em;color:var(--slate);}
   .navlinks a:hover{color:var(--maroon);}
+  .nav-actions{display:flex;align-items:center;gap:10px;}
   .btn{
     font-family:'Cormorant Garamond';font-weight:600;font-size:14.5px;letter-spacing:0.04em;
     padding:10px 22px;border-radius:2px;border:1px solid var(--maroon);
     color:var(--ivory);background:var(--maroon);cursor:pointer;
-    transition:transform .2s, box-shadow .2s;
+    transition:transform .2s, box-shadow .2s, background .2s, border-color .2s;
   }
   .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(107,22,38,0.25);}
   .btn.ghost{background:transparent;color:var(--maroon);}
+  .btn-editing{background:var(--teal) !important;border-color:var(--teal) !important;color:#fff !important;}
+
+  /* Live Edit Visual Feedback */
+  body.edit-mode [data-key] {
+    outline: 1.5px dashed var(--marigold) !important;
+    outline-offset: 3px;
+    border-radius: 3px;
+    cursor: text;
+    transition: outline 0.2s, background 0.2s;
+  }
+  body.edit-mode [data-key]:hover {
+    background: rgba(244, 163, 64, 0.15) !important;
+    outline-color: var(--maroon) !important;
+  }
+  body.edit-mode [data-key]:focus {
+    outline: 2px solid var(--maroon) !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+  }
+
+  /* Date Picker styling */
+  .date-picker-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wedding-date-picker {
+    display: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--marigold);
+    background: var(--ivory);
+    color: var(--maroon-deep);
+    font-family: 'Mukta', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    vertical-align: middle;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  body.edit-mode .wedding-date-picker {
+    display: inline-flex;
+  }
 
   /* HERO */
   .hero{
@@ -260,16 +304,39 @@
 
 <header>
   <nav>
-    <div class="logo">A &amp; D</div>
+    <div class="logo" data-key="nav-logo">A &amp; D</div>
     <div class="navlinks">
       <a href="#memories">Our Story</a>
       <a href="#events">Events</a>
       <a href="#venue">Venue</a>
       <a href="#rsvp">RSVP</a>
     </div>
-    <a href="#rsvp" class="btn">RSVP</a>
+    <div class="nav-actions">
+      <button id="editToggleBtn" class="btn ghost" style="padding: 8px 16px; display: inline-flex; align-items: center; gap: 6px;">
+        <span id="editIcon">✏️</span>
+        <span id="editLabel">Edit Card</span>
+      </button>
+      <button id="cancelEditBtn" class="btn ghost" style="display: none; padding: 8px 12px; color: var(--slate); border-color: rgba(122,97,82,0.4);" title="Cancel Editing">
+        ❌ Cancel
+      </button>
+      <button id="resetCardBtn" class="btn ghost" style="display: none; padding: 8px 12px; color: var(--maroon); border-color: rgba(107,22,38,0.3);" title="Reset to Original Defaults">
+        🔄 Reset
+      </button>
+      <a href="#rsvp" class="btn">RSVP</a>
+    </div>
   </nav>
 </header>
+
+<!-- Live Edit Banner -->
+<div id="editBanner" style="display:none; position:fixed; top:65px; left:0; right:0; z-index:99; background: var(--marigold); color: var(--maroon-deep); text-align:center; padding: 10px 16px; font-weight:600; font-size:14px; box-shadow: 0 2px 10px rgba(0,0,0,0.15);">
+  ✨ <strong>Live Edit Mode Active:</strong> Click on any text in the invitation to edit it directly. Click <strong>"Save Changes"</strong> on the navbar when finished!
+</div>
+
+<!-- Toast Notification -->
+<div id="toastMsg" style="position:fixed; bottom:24px; right:24px; z-index:1000; background: var(--teal); color: white; padding: 12px 20px; border-radius: 4px; font-weight: 500; box-shadow: 0 4px 14px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+  <span id="toastIcon">✅</span>
+  <span id="toastText">Changes saved to browser storage!</span>
+</div>
 
 <section class="hero">
   <div class="bandhani-bg"></div>
@@ -282,10 +349,16 @@
   </div>
 
   <div class="hero-inner">
-    <div class="gujarati">સ્વાગત — સ્વાગત — સ્વાગત</div>
-    <div class="invite-line">Together with their families</div>
-    <h1 class="names">Aashka <span class="amp">&amp;</span> Dhruv</h1>
-    <div class="date-line">request the honour of your presence · <span>12th December 2026</span></div>
+    <div class="gujarati" data-key="hero-gujarati">સ્વાગત — સ્વાગત — સ્વાગત</div>
+    <div class="invite-line" data-key="hero-invite-line">Together with their families</div>
+    <h1 class="names"><span data-key="bride-name">Aashka</span> <span class="amp">&amp;</span> <span data-key="groom-name">Dhruv</span></h1>
+    <div class="date-line">
+      <span data-key="date-prefix">request the honour of your presence · </span>
+      <span class="date-picker-wrap">
+        <span data-key="wedding-date" id="weddingDateDisplay">12th December 2026</span>
+        <input type="date" id="weddingDatePicker" class="wedding-date-picker" title="Pick Wedding Date (Today or future dates only)">
+      </span>
+    </div>
 
     <div class="countdown" id="countdown">
       <div class="cd-box"><div class="n" id="cd-days">00</div><div class="l">Days</div></div>
@@ -295,7 +368,7 @@
     </div>
 
     <div class="hero-cta">
-      <a href="#rsvp" class="btn" style="background:var(--marigold);border-color:var(--marigold);color:var(--maroon-deep);">Join the celebration →</a>
+      <a href="#rsvp" class="btn" style="background:var(--marigold);border-color:var(--marigold);color:var(--maroon-deep);" data-key="hero-cta-text">Join the celebration →</a>
     </div>
   </div>
 </section>
@@ -307,18 +380,18 @@
   <section id="memories">
     <div class="wrap">
       <div class="section-head reveal">
-        <div class="eyebrow">Some Memories</div>
-        <h2>Our Journey So Far</h2>
-        <p>From a chance meeting to forever — a few moments along the way. <em>(Placeholder cards — swap in your own photos!)</em></p>
+        <div class="eyebrow" data-key="memories-eyebrow">Some Memories</div>
+        <h2 data-key="memories-title">Our Journey So Far</h2>
+        <p data-key="memories-subtitle">From a chance meeting to forever — a few moments along the way.</p>
       </div>
 
       <div class="timeline">
         <div class="tl-item reveal">
           <div class="card">
-            <div class="photo" style="background:linear-gradient(135deg,#F4A340,#6B1626);">First Meeting</div>
-            <h4>Where It Began</h4>
-            <div class="yr">Ahmedabad, 2021</div>
-            <p class="desc">A mutual friend's garba night — one dandiya round in, and it felt like we'd known each other for years.</p>
+            <div class="photo" style="background:linear-gradient(135deg,#F4A340,#6B1626);" data-key="mem-1-photo">First Meeting</div>
+            <h4 data-key="mem-1-title">Where It Began</h4>
+            <div class="yr" data-key="mem-1-yr">Ahmedabad, 2021</div>
+            <p class="desc" data-key="mem-1-desc">A mutual friend's garba night — one dandiya round in, and it felt like we'd known each other for years.</p>
           </div>
           <div class="tl-dot"></div>
           <div class="spacer"></div>
@@ -328,19 +401,19 @@
           <div class="spacer"></div>
           <div class="tl-dot"></div>
           <div class="card">
-            <div class="photo" style="background:linear-gradient(135deg,#5B2C6F,#F4A340);">First Trip</div>
-            <h4>Kutch, Under the Stars</h4>
-            <div class="yr">2022</div>
-            <p class="desc">The white desert, a bonfire, and far too many photos of the same sunset.</p>
+            <div class="photo" style="background:linear-gradient(135deg,#5B2C6F,#F4A340);" data-key="mem-2-photo">First Trip</div>
+            <h4 data-key="mem-2-title">Kutch, Under the Stars</h4>
+            <div class="yr" data-key="mem-2-yr">2022</div>
+            <p class="desc" data-key="mem-2-desc">The white desert, a bonfire, and far too many photos of the same sunset.</p>
           </div>
         </div>
 
         <div class="tl-item reveal">
           <div class="card">
-            <div class="photo" style="background:linear-gradient(135deg,#0F6E63,#C9A24B);">The Proposal</div>
-            <h4>He Asked, She Cried (Happy Tears)</h4>
-            <div class="yr">2024</div>
-            <p class="desc">On the terrace where we had our first cup of chai together — some things come full circle.</p>
+            <div class="photo" style="background:linear-gradient(135deg,#0F6E63,#C9A24B);" data-key="mem-3-photo">The Proposal</div>
+            <h4 data-key="mem-3-title">He Asked, She Cried (Happy Tears)</h4>
+            <div class="yr" data-key="mem-3-yr">2024</div>
+            <p class="desc" data-key="mem-3-desc">On the terrace where we had our first cup of chai together — some things come full circle.</p>
           </div>
           <div class="tl-dot"></div>
           <div class="spacer"></div>
@@ -350,19 +423,19 @@
           <div class="spacer"></div>
           <div class="tl-dot"></div>
           <div class="card">
-            <div class="photo" style="background:linear-gradient(135deg,#6B1626,#F4A340);">Family Blessings</div>
-            <h4>Both Families, One Toast</h4>
-            <div class="yr">2025</div>
-            <p class="desc">Two families becoming one over a very long, very happy dinner.</p>
+            <div class="photo" style="background:linear-gradient(135deg,#6B1626,#F4A340);" data-key="mem-4-photo">Family Blessings</div>
+            <h4 data-key="mem-4-title">Both Families, One Toast</h4>
+            <div class="yr" data-key="mem-4-yr">2025</div>
+            <p class="desc" data-key="mem-4-desc">Two families becoming one over a very long, very happy dinner.</p>
           </div>
         </div>
 
         <div class="tl-item reveal">
           <div class="card">
-            <div class="photo" style="background:linear-gradient(135deg,#F4A340,#5B2C6F);">Today</div>
-            <h4>And Now, Our Wedding</h4>
-            <div class="yr">12 December 2026</div>
-            <p class="desc">We'd love nothing more than for you to be there as we begin this next chapter.</p>
+            <div class="photo" style="background:linear-gradient(135deg,#F4A340,#5B2C6F);" data-key="mem-5-photo">Today</div>
+            <h4 data-key="mem-5-title">And Now, Our Wedding</h4>
+            <div class="yr" data-key="mem-5-yr">12 December 2026</div>
+            <p class="desc" data-key="mem-5-desc">We'd love nothing more than for you to be there as we begin this next chapter.</p>
           </div>
           <div class="tl-dot"></div>
           <div class="spacer"></div>
@@ -377,15 +450,35 @@
   <section id="events">
     <div class="wrap">
       <div class="section-head reveal">
-        <div class="eyebrow">The Celebration</div>
-        <h2>Wedding Events</h2>
-        <p>Four days of colour, dance and blessings — hope you can make it to all of them.</p>
+        <div class="eyebrow" data-key="events-eyebrow">The Celebration</div>
+        <h2 data-key="events-title">Wedding Events</h2>
+        <p data-key="events-subtitle">Four days of colour, dance and blessings — hope you can make it to all of them.</p>
       </div>
       <div class="events">
-        <div class="event reveal"><div class="ic">🌿</div><h4>Mehndi</h4><div class="when">9 Dec · Evening</div><div class="where">Shah Residence, Ahmedabad</div></div>
-        <div class="event reveal"><div class="ic">🎶</div><h4>Sangeet &amp; Garba</h4><div class="when">10 Dec · 7 PM onward</div><div class="where">Vatva Banquet Hall</div></div>
-        <div class="event reveal"><div class="ic">🔥</div><h4>Wedding</h4><div class="when">12 Dec · Morning Muhurat</div><div class="where">Sabarmati Riverfront Lawns</div></div>
-        <div class="event reveal"><div class="ic">🥂</div><h4>Reception</h4><div class="when">13 Dec · 7 PM onward</div><div class="where">The Grand Bhagwati</div></div>
+        <div class="event reveal">
+          <div class="ic" data-key="event-1-ic">🌿</div>
+          <h4 data-key="event-1-title">Mehndi</h4>
+          <div class="when" data-key="event-1-when">9 Dec · Evening</div>
+          <div class="where" data-key="event-1-where">Shah Residence, Ahmedabad</div>
+        </div>
+        <div class="event reveal">
+          <div class="ic" data-key="event-2-ic">🎶</div>
+          <h4 data-key="event-2-title">Sangeet &amp; Garba</h4>
+          <div class="when" data-key="event-2-when">10 Dec · 7 PM onward</div>
+          <div class="where" data-key="event-2-where">Vatva Banquet Hall</div>
+        </div>
+        <div class="event reveal">
+          <div class="ic" data-key="event-3-ic">🔥</div>
+          <h4 data-key="event-3-title">Wedding</h4>
+          <div class="when" data-key="event-3-when">12 Dec · Morning Muhurat</div>
+          <div class="where" data-key="event-3-where">Sabarmati Riverfront Lawns</div>
+        </div>
+        <div class="event reveal">
+          <div class="ic" data-key="event-4-ic">🥂</div>
+          <h4 data-key="event-4-title">Reception</h4>
+          <div class="when" data-key="event-4-when">13 Dec · 7 PM onward</div>
+          <div class="where" data-key="event-4-where">The Grand Bhagwati</div>
+        </div>
       </div>
     </div>
   </section>
@@ -401,10 +494,10 @@
           <div class="pin"></div>
         </div>
         <div class="venue-info reveal">
-          <div class="eyebrow">Venue</div>
-          <h3>Sabarmati Riverfront Lawns, Ahmedabad</h3>
-          <p>Open-air mandap by the river, with parking and valet available from Gate 3. Ceremony begins promptly at the muhurat time — do arrive a little early for the baraat.</p>
-          <a href="#" class="btn ghost">Get directions →</a>
+          <div class="eyebrow" data-key="venue-eyebrow">Venue</div>
+          <h3 data-key="venue-title">Sabarmati Riverfront Lawns, Ahmedabad</h3>
+          <p data-key="venue-desc">Open-air mandap by the river, with parking and valet available from Gate 3. Ceremony begins promptly at the muhurat time — do arrive a little early for the baraat.</p>
+          <a href="#" class="btn ghost" data-key="venue-btn-text">Get directions →</a>
         </div>
       </div>
     </div>
@@ -416,9 +509,9 @@
   <section id="rsvp">
     <div class="wrap">
       <div class="section-head reveal">
-        <div class="eyebrow">Kindly Respond</div>
-        <h2>RSVP</h2>
-        <p>Let us know if you'll be joining — by 15th November 2026.</p>
+        <div class="eyebrow" data-key="rsvp-eyebrow">Kindly Respond</div>
+        <h2 data-key="rsvp-title">RSVP</h2>
+        <p data-key="rsvp-subtitle">Let us know if you'll be joining — by 15th November 2026.</p>
       </div>
       <form class="rsvp-form reveal" id="rsvpForm">
         <div>
@@ -447,7 +540,7 @@
           <textarea id="message" placeholder="Your blessings and wishes..."></textarea>
         </div>
         <button type="submit" class="btn" style="justify-self:center;">Send RSVP</button>
-        <div class="rsvp-note">This is a demo form — connect it to your own form service or backend to collect real responses.</div>
+        <div class="rsvp-note" data-key="rsvp-note">This is a demo form — connect it to your own form service or backend to collect real responses.</div>
         <div id="rsvpMsg">Thank you! Your RSVP has been noted with love. 🌼</div>
       </form>
     </div>
@@ -455,9 +548,9 @@
 </main>
 
 <footer>
-  <div class="script">Aashka &amp; Dhruv</div>
-  <p>With love and gratitude, we invite you to celebrate with us.</p>
-  <div class="fam">THE SHAH &amp; MEHTA FAMILIES · AHMEDABAD, GUJARAT</div>
+  <div class="script" data-key="footer-names">Aashka &amp; Dhruv</div>
+  <p data-key="footer-note">With love and gratitude, we invite you to celebrate with us.</p>
+  <div class="fam" data-key="footer-fam">THE SHAH &amp; MEHTA FAMILIES · AHMEDABAD, GUJARAT</div>
 </footer>
 
 <script>
@@ -507,10 +600,115 @@
   revealEls.forEach(el=>io.observe(el));
 
   // Countdown to wedding date
-  const weddingDate = new Date('2026-12-12T08:00:00');
+  let weddingTargetDate = new Date('2026-12-12T08:00:00');
+  const weddingDatePicker = document.getElementById('weddingDatePicker');
+  const weddingDateDisplay = document.getElementById('weddingDateDisplay');
+
+  // Set minimum date for picker to today (disabling past dates)
+  const todayObj = new Date();
+  todayObj.setHours(0,0,0,0);
+  const todayISO = todayObj.toISOString().split('T')[0];
+  if (weddingDatePicker) {
+    weddingDatePicker.min = todayISO;
+  }
+
+  function formatWeddingDate(dateObj) {
+    const day = dateObj.getDate();
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const month = monthNames[dateObj.getMonth()];
+    const year = dateObj.getFullYear();
+
+    let suffix = "th";
+    if (day % 10 === 1 && day !== 11) suffix = "st";
+    else if (day % 10 === 2 && day !== 12) suffix = "nd";
+    else if (day % 10 === 3 && day !== 13) suffix = "rd";
+
+    return `${day}${suffix} ${month} ${year}`;
+  }
+
+  function parseWeddingDate(str) {
+    if (!str) return null;
+    let cleaned = str.replace(/<[^>]*>/g, '').trim();
+    cleaned = cleaned.replace(/(\d+)(st|nd|rd|th)/i, '$1').replace(/[·•]/g, '').trim();
+    const parsed = Date.parse(cleaned);
+    if (!isNaN(parsed)) {
+      return new Date(parsed);
+    }
+    const monthNames = ["january","february","march","april","may","june","july","august","september","october","november","december","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+    const words = cleaned.toLowerCase().split(/\s+/);
+    let day, month, year;
+    words.forEach(w => {
+      if (/^\d{4}$/.test(w)) year = parseInt(w);
+      else if (/^\d{1,2}$/.test(w)) day = parseInt(w);
+      else {
+        const idx = monthNames.findIndex(m => w.startsWith(m));
+        if (idx !== -1) month = idx % 12;
+      }
+    });
+    if (year && month !== undefined && day) {
+      return new Date(year, month, day, 8, 0, 0);
+    }
+    return null;
+  }
+
+  function syncDatePicker() {
+    if (!weddingDatePicker || !weddingTargetDate || isNaN(weddingTargetDate.getTime())) return;
+    const yyyy = weddingTargetDate.getFullYear();
+    const mm = String(weddingTargetDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(weddingTargetDate.getDate()).padStart(2, '0');
+    weddingDatePicker.value = `${yyyy}-${mm}-${dd}`;
+  }
+
+  function updateTargetDateFromElement() {
+    const dateEl = document.querySelector('[data-key="wedding-date"]');
+    if (dateEl) {
+      const parsed = parseWeddingDate(dateEl.textContent);
+      if (parsed && !isNaN(parsed.getTime())) {
+        weddingTargetDate = parsed;
+        syncDatePicker();
+        updateCountdown();
+      }
+    }
+  }
+
+  // Handle date selection from calendar
+  if (weddingDatePicker) {
+    weddingDatePicker.addEventListener('change', function() {
+      if (!this.value) return;
+      const chosen = new Date(this.value + 'T08:00:00');
+      if (chosen < todayObj) {
+        showToast('Please select today or a future date!', '⚠️');
+        syncDatePicker();
+        return;
+      }
+
+      weddingTargetDate = chosen;
+      const formatted = formatWeddingDate(chosen);
+      if (weddingDateDisplay) {
+        weddingDateDisplay.textContent = formatted;
+      }
+      updateCountdown();
+      showToast(`Date updated to ${formatted}!`, '📅');
+    });
+  }
+
+  // Clicking on date text in Edit mode triggers calendar picker
+  if (weddingDateDisplay) {
+    weddingDateDisplay.addEventListener('click', function(e) {
+      if (isEditMode && weddingDatePicker) {
+        try {
+          weddingDatePicker.showPicker();
+        } catch (err) {
+          weddingDatePicker.focus();
+          weddingDatePicker.click();
+        }
+      }
+    });
+  }
+
   function updateCountdown(){
     const now = new Date();
-    let diff = weddingDate - now;
+    let diff = weddingTargetDate - now;
     if(diff < 0) diff = 0;
     const days = Math.floor(diff/(1000*60*60*24));
     const hours = Math.floor((diff/(1000*60*60))%24);
@@ -527,29 +725,182 @@
   // RSVP form (demo only, no backend)
   const scriptURL = "https://script.google.com/macros/s/AKfycbx15bgg1evrPliCVV3g6Bcw9MjtgugK6vI8QkF-dLzzZ0LXRc47Khe2Oy0aAoaXzXJN/exec";
 
-document.getElementById("rsvpForm").addEventListener("submit", function(e) {
-    e.preventDefault();
+  document.getElementById("rsvpForm").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-    const formData = {
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        guests: document.getElementById("guests").value,
-        attending: document.getElementById("attending").value,
-        message: document.getElementById("message").value
-    };
+      const formData = {
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          guests: document.getElementById("guests").value,
+          attending: document.getElementById("attending").value,
+          message: document.getElementById("message").value
+      };
 
-    fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(formData)
-    })
-    .then(() => {
-        document.getElementById("rsvpMsg").style.display = "block";
-        this.reset();
-    })
-    .catch(err => {
-        alert("Error: " + err);
+      fetch(scriptURL, {
+          method: "POST",
+          body: JSON.stringify(formData)
+      })
+      .then(() => {
+          document.getElementById("rsvpMsg").style.display = "block";
+          this.reset();
+      })
+      .catch(err => {
+          alert("Error: " + err);
+      });
+  });
+
+  // --- LIVE EDITING & LOCAL STORAGE LOGIC ---
+  const editToggleBtn = document.getElementById('editToggleBtn');
+  const editIcon = document.getElementById('editIcon');
+  const editLabel = document.getElementById('editLabel');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+  const resetCardBtn = document.getElementById('resetCardBtn');
+  const editBanner = document.getElementById('editBanner');
+  const toastMsg = document.getElementById('toastMsg');
+  const toastText = document.getElementById('toastText');
+  let isEditMode = false;
+  let editSnapshot = {};
+
+  // Load saved content from localStorage on startup
+  function loadSavedData() {
+    const saved = localStorage.getItem('weddingCardData');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        Object.keys(data).forEach(key => {
+          const el = document.querySelector(`[data-key="${key}"]`);
+          if (el) {
+            el.innerHTML = data[key];
+          }
+        });
+      } catch (err) {
+        console.error("Failed to parse saved invitation data:", err);
+      }
+    }
+    updateTargetDateFromElement();
+  }
+
+  // Bind date element live input
+  const dateElement = document.querySelector('[data-key="wedding-date"]');
+  if (dateElement) {
+    dateElement.addEventListener('input', updateTargetDateFromElement);
+    dateElement.addEventListener('blur', updateTargetDateFromElement);
+  }
+
+  // Prevent link navigation during edit mode
+  document.querySelectorAll('a[data-key]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      if (isEditMode) e.preventDefault();
     });
-});
+  });
+
+  // Toggle Edit / Save Mode
+  editToggleBtn.addEventListener('click', function() {
+    isEditMode = !isEditMode;
+    const editableEls = document.querySelectorAll('[data-key]');
+
+    if (isEditMode) {
+      // Capture snapshot before editing
+      editSnapshot = {};
+      editableEls.forEach(el => {
+        const key = el.getAttribute('data-key');
+        editSnapshot[key] = el.innerHTML;
+      });
+
+      // Enable editing
+      document.body.classList.add('edit-mode');
+      editableEls.forEach(el => {
+        el.setAttribute('contenteditable', 'true');
+      });
+
+      editToggleBtn.classList.add('btn-editing');
+      editIcon.textContent = '💾';
+      editLabel.textContent = 'Save Changes';
+      cancelEditBtn.style.display = 'inline-flex';
+      resetCardBtn.style.display = 'inline-flex';
+      editBanner.style.display = 'block';
+
+      showToast('Edit mode active! Click any text to edit.', '✏️');
+    } else {
+      // Save changes
+      const data = {};
+      editableEls.forEach(el => {
+        el.setAttribute('contenteditable', 'false');
+        const key = el.getAttribute('data-key');
+        data[key] = el.innerHTML;
+      });
+
+      document.body.classList.remove('edit-mode');
+      localStorage.setItem('weddingCardData', JSON.stringify(data));
+      updateTargetDateFromElement();
+
+      editToggleBtn.classList.remove('btn-editing');
+      editIcon.textContent = '✏️';
+      editLabel.textContent = 'Edit Card';
+      cancelEditBtn.style.display = 'none';
+      resetCardBtn.style.display = 'none';
+      editBanner.style.display = 'none';
+
+      showToast('Invitation changes saved successfully!', '✅');
+    }
+  });
+
+  // Cancel Edit action
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', function() {
+      if (!isEditMode) return;
+
+      // Restore elements from snapshot
+      Object.keys(editSnapshot).forEach(key => {
+        const el = document.querySelector(`[data-key="${key}"]`);
+        if (el && editSnapshot[key] !== undefined) {
+          el.innerHTML = editSnapshot[key];
+        }
+      });
+
+      // Disable edit mode
+      isEditMode = false;
+      document.body.classList.remove('edit-mode');
+      document.querySelectorAll('[data-key]').forEach(el => {
+        el.setAttribute('contenteditable', 'false');
+      });
+
+      editToggleBtn.classList.remove('btn-editing');
+      editIcon.textContent = '✏️';
+      editLabel.textContent = 'Edit Card';
+      cancelEditBtn.style.display = 'none';
+      resetCardBtn.style.display = 'none';
+      editBanner.style.display = 'none';
+
+      updateTargetDateFromElement();
+      showToast('Editing cancelled. Unsaved changes discarded.', 'ℹ️');
+    });
+  }
+
+  // Reset all changes back to defaults
+  resetCardBtn.addEventListener('click', function() {
+    if (confirm('Are you sure you want to reset all changes back to original defaults?')) {
+      localStorage.removeItem('weddingCardData');
+      location.reload();
+    }
+  });
+
+  // Toast Notification helper
+  let toastTimer;
+  function showToast(msg, icon = '✅') {
+    clearTimeout(toastTimer);
+    toastText.textContent = msg;
+    document.getElementById('toastIcon').textContent = icon;
+    toastMsg.style.transform = 'translateY(0)';
+    toastMsg.style.opacity = '1';
+    toastTimer = setTimeout(() => {
+      toastMsg.style.transform = 'translateY(100px)';
+      toastMsg.style.opacity = '0';
+    }, 3500);
+  }
+
+  // Load saved invitation data on page load
+  loadSavedData();
 </script>
 
 </body>
